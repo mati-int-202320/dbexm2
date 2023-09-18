@@ -2,3 +2,9 @@ oc new-app postgresql-persistent \
   --param=POSTGRESQL_USER=myuser \
   --param=POSTGRESQL_PASSWORD=mypassword \
   --param=POSTGRESQL_DATABASE=mydb
+
+//no funciona, hay que hacerlo amano
+wget https://github.com/dgomezqu/dbexm/blob/main/creacion_tabla_cc.sql
+
+oc cp creacion_tabla_cc.sql $pod_name:/tmp/creacion_tabla_cc.sql
+oc exec -it $pod_name -- psql -U myuser -d mydb -f /tmp/creacion_tabla_cc.sql
