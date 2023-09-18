@@ -1,0 +1,60 @@
+﻿kind: Service
+apiVersion: v1
+metadata:
+  name: postgresql
+  namespace: andrezsgalindo-dev
+  uid: ef41d39d-642b-45be-8a29-1b6b9247958b
+  resourceVersion: '3057410637'
+  creationTimestamp: '2023-09-17T15:49:32Z'
+  labels:
+    template: postgresql-persistent-template
+    template.openshift.io/template-instance-owner: 4955c444-dc30-41f9-8d18-d4b2b2a3cd56
+  annotations:
+    template.openshift.io/expose-uri: 'postgres://{.spec.clusterIP}:{.spec.ports[?(.name=="postgresql")].port}'
+  managedFields:
+    - manager: openshift-controller-manager
+      operation: Update
+      apiVersion: v1
+      time: '2023-09-17T15:49:32Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            .: {}
+            'f:template.openshift.io/expose-uri': {}
+          'f:labels':
+            .: {}
+            'f:template': {}
+            'f:template.openshift.io/template-instance-owner': {}
+        'f:spec':
+          'f:internalTrafficPolicy': {}
+          'f:ports':
+            .: {}
+            'k:{"port":5432,"protocol":"TCP"}':
+              .: {}
+              'f:name': {}
+              'f:port': {}
+              'f:protocol': {}
+              'f:targetPort': {}
+          'f:selector': {}
+          'f:sessionAffinity': {}
+          'f:type': {}
+spec:
+  ports:
+    - name: postgresql
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+  selector:
+    name: postgresql
+  clusterIP: 172.30.223.192
+  clusterIPs:
+    - 172.30.223.192
+  type: ClusterIP
+  sessionAffinity: None
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  internalTrafficPolicy: Cluster
+status:
+  loadBalancer: {}
