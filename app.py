@@ -15,7 +15,7 @@ def get_data():
         )
 
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM your_table")
+        cursor.execute("SELECT * FROM CIUDADANO")
         data = cursor.fetchall()
 
         return str(data)
