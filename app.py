@@ -7,7 +7,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://myuser:mypassword@postgres
 db = SQLAlchemy(app)
 
 class Ciudadano(db.Model):
-    __tablename__ = 'ciudadano'
+    __tablename__ = 'CIUDADANO'
     numero_identificacion = db.Column(db.Integer, primary_key=True)
     tipo_identificacion = db.Column(db.String(100))
     # ... other columns
