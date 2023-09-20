@@ -1,58 +1,32 @@
 from flask import Flask, jsonify
-import psycopg2
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import SQLAlchemyError
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://myuser:mypassword@postgresql:5432/mydb'
+db = SQLAlchemy(app)
 
-# Sample data (replace with your actual data retrieval logic)
-data = {
-    "1": {"TIPOIDENTIFICACION": "1", "NUMEROIDENTIFICACION": "12345", "FECHAEXPEDICION": "2023-09-15", "name": "John", "last_name": "Doe"},
-    "2": {"TIPOIDENTIFICACION": "2", "NUMEROIDENTIFICACION": "67890", "FECHAEXPEDICION": "2023-09-16", "name": "Jane", "last_name": "Smith"},
-}
+class Ciudadano(db.Model):
+    __tablename__ = 'ciudadano'
+    numero_identificacion = db.Column(db.Integer, primary_key=True)
+    tipo_identificacion = db.Column(db.String(100))
+    # ... other columns
 
-def get_operator_data(TIPOIDENTIFICACION, NUMEROIDENTIFICACION):
-    # Add your PostgreSQL database connection code here
+@app.route('/consultar/<int:numero_identificacion>/<string:tipo_identificacion>', methods=['GET'])
+def consultar_ciudadano(numero_identificacion, tipo_identificacion):
     try:
-        conn = psycopg2.connect(
-            database="mydb",
-            user="myuser",
-            password="mypassword",
-            host="postgresql",
-            port="5432",
-        )
-
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM your_table WHERE TIPOIDENTIFICACION=%s AND NUMEROIDENTIFICACION=%s", (TIPOIDENTIFICACION, NUMEROIDENTIFICACION))
-        operator_data = cursor.fetchone()
-
-        if operator_data:
-            return {
-                "TIPOIDENTIFICACION": operator_data[1],
-                "NUMEROIDENTIFICACION": operator_data[2],
-                "FECHAEXPEDICION": operator_data[3],
-                "name": operator_data[4],
-                "last_name": operator_data[5]
-            }
+        ciudadano = Ciudadano.query.filter_by(numero_identificacion=numero_identificacion, tipo_identificacion=tipo_identificacion).first()
+        if ciudadano:
+            return jsonify({
+                'numero_identificacion': ciudadano.numero_identificacion,
+                'tipo_identificacion': ciudadano.tipo_identificacion,
+                'fecha_expedicion': ciudadano.fecha_expedicion,
+                # ... other fields
+            })
         else:
-            return None
-    except Exception as e:
-        return str(e)
-    finally:
-        cursor.close()
-        conn.close()
-
-@app.route('/operador/consultar/<TIPOIDENTIFICACION>/<NUMEROIDENTIFICACION>', methods=['GET'])
-def consultar_operador(TIPOIDENTIFICACION, NUMEROIDENTIFICACION):
-    # Check if TIPOIDENTIFICACION and NUMEROIDENTIFICACION exist in the sample data
-    operator_info = data.get(TIPOIDENTIFICACION, {}).get(NUMEROIDENTIFICACION)
-    if operator_info:
-        return jsonify(operator_info)
-    else:
-        # If not found in the sample data, try fetching from the database
-        database_result = get_operator_data(TIPOIDENTIFICACION, NUMEROIDENTIFICACION)
-        if database_result:
-            return jsonify(database_result)
-        else:
-            return jsonify({"error": "Operador not found"}), 404
+            return jsonify({'message': 'Ciudadano not found'}), 404
+    except SQLAlchemyError as e:
+        return jsonify({'message': 'Error accessing the database'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8080)
