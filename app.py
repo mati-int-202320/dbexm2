@@ -7,10 +7,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://myuser:mypassword@postgres
 db = SQLAlchemy(app)
 
 class Ciudadano(db.Model):
-    __tablename__ = 'CIUDADANO'
+    __tablename__ = 'CIUDADANO'  # Match the table name in your database
     numero_identificacion = db.Column(db.Integer, primary_key=True)
     tipo_identificacion = db.Column(db.String(100))
-    # ... other columns
+    fecha_expedicion = db.Column(db.Date)  # Add this column to match your table structure
+    nombres = db.Column(db.String(100))  # Add other columns to match your table structure
+    primera_apellido = db.Column(db.String(100))
+    segundo_apellido = db.Column(db.String(100))
+    cuenta_correo = db.Column(db.String(100))
+    celular = db.Column(db.Integer)
 
 @app.route('/consultar/<int:numero_identificacion>/<string:tipo_identificacion>', methods=['GET'])
 def consultar_ciudadano(numero_identificacion, tipo_identificacion):
